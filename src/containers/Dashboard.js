@@ -87,15 +87,24 @@ export default class {
 
   handleEditTicket(e, bill, bills) {
     if (!this.counters) this.counters = {}
-    if (!this.counters[index]) this.counters[index] = 0
-    if (this.counter % 2 === 0) {
+    if (!this.counters[bill.id]) this.counters[bill.id] = 0
+    if (this.lastActiveBillId && this.lastActiveBillId !== bill.id) {
+      Object.keys(this.counters).forEach(billId => {
+        if (billId !== bill.id && billId !== 'lastActiveBillId') {
+          this.counters[billId] = 0
+        }
+      })
+    }
+    this.lastActiveBillId = bill.id
+    
+    if (this.counters[bill.id] % 2 === 0) {
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
-      this.counter ++
+      this.counters[bill.id]++
     } else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
@@ -103,7 +112,7 @@ export default class {
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
-      this.counter ++
+      this.counters[bill.id]++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
